@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
+import { useCart } from './CartContext';
 
 export interface CartItem {
     id: number;
@@ -10,7 +11,8 @@ export interface CartItem {
     image: string;
 }
 
-const CartCard = ({ item, removeFromCart, updateQuantity, key }: { item: CartItem; removeFromCart: (id: number) => void; updateQuantity: (id: number, quantity: number) => void; key: number }) => {
+const CartCard = ({ item, key }: { item: CartItem; key: number }) => {
+    const { cart, removeFromCart, updateQuantity } = useCart();
     return (
         <div key={item.id} className="bg-white p-4 rounded-lg shadow-md flex flex-col md:flex-row items-center mb-4">
             <Image src={item.image} alt={item.title} width={100} height={100} className="w-32 h-32 object-cover rounded-lg mr-4" />
