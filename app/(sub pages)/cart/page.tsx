@@ -30,8 +30,8 @@ const Cart: NextPage = () => {
       {cart.length === 0 ? (
         <p>Your cart is empty. <Link href="/"><a className="text-blue-500 underline">Go back to shopping</a></Link></p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6">
             {cart.map((item, index) => (
               <CartCard key={index} item={item} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />
             ))}

@@ -2,7 +2,7 @@ import React from 'react'
 
 const CartSummary = ({ subtotal, discount, total, discountCode, setDiscountCode, handleDiscountApply }: any) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white p-6 rounded-lg shadow-md max-w-[300px] lg:max-w-sm h-[400px] w-full mx-auto">
             <h2 className="text-2xl font-semibold mb-4">Cart Summary</h2>
             <p className="text-lg">Subtotal: ${subtotal.toFixed(2)}</p>
             {discount !== null && (
