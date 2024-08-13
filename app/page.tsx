@@ -1,15 +1,12 @@
-import ProductCard from "@/components/ProductCard";
+
+import ProductGrid from "@/components/ProductGrid";
 import React from "react";
 
 export default function Home() {
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <ProductCard
-        image="https://picsum.photos/300/200"
-        name="Sample Product"
-        description="Sample description"
-        price={29.99}
-      />
+    <div className="max-w-7xl mx-auto  mt-10 flex flex-col gap-6 px-2 items-center justify-center">
+      <h1 className="text-3xl font-bold">Hello world!</h1>
+      <ProductGrid />
     </div>
   );
 }
