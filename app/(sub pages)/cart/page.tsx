@@ -1,65 +1,46 @@
 "use client";
+import CartCard from '@/components/CartCard';
+import { useCart } from '@/components/CartContext';
+import CartSummary from '@/components/CartSummary';
 import { NextPage } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useCart } from '@/components/CartContext';
+import { useState } from 'react';
 
 const Cart: NextPage = () => {
-    const { cart,updateQuantity, removeFromCart, calculateSubtotal } = useCart();
-    const subtotal = calculateSubtotal();
-    return (
-        <div className="min-h-screen bg-gray-100 p-8">
-          <h1 className="text-3xl font-bold mb-8">Your Shopping Cart</h1>
-          {cart.length === 0 ? (
-            <p>Your cart is empty. <Link href="/" className="text-blue-500 underline">Go back to shopping</Link></p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cart.map(item => (
-                <div key={item.id} className="bg-white p-4 rounded-lg shadow-md">
-                  <Image src={item.image} alt={item.title} width={300} height={300} className="w-full h-48 object-cover mb-4 rounded-lg" />
-                  <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
-                  {/* <p className="text-gray-700 text-sm">₹{item.price.toFixed(2)} x {item.quantity}</p> */}
-                  <p className="text-gray-900 font-bold mt-2">Total: ₹{(item.price * item.quantity).toFixed(2)}</p>
-                  <div className="flex items-center mt-2">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="px-2 py-1 bg-gray-200 rounded-lg mr-2"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      value={item.quantity}
-                      readOnly
-                      className="w-12 text-center border rounded-lg"
-                    />
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-2 py-1 bg-gray-200 rounded-lg ml-2"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="mt-4 w-full bg-red-500 text-white py-2 px-4 rounded-md border-2 border-red-500 hover:bg-white hover:text-red-500 transition-all duration-300"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {cart.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-2xl font-semibold">Total Amount: ₹ {subtotal.toFixed(2)}</h2>
-              <button className="mt-4 bg-green-500 text-white py-2 px-4 rounded-md border-2 border-green-500 hover:bg-white hover:text-green-500 transition-all duration-300">
-                Proceed to Checkout
-              </button>
-            </div>
-          )}
+  const { cart, removeFromCart, updateQuantity, calculateSubtotal } = useCart();
+  const [discount, setDiscount] = useState<number | null>(null);
+  const [discountCode, setDiscountCode] = useState<string>('');
+
+  const subtotal = calculateSubtotal();
+  const total = discount ? subtotal - discount : subtotal;
+
+  const handleDiscountApply = () => {
+    if (discountCode === 'SAVE10') {
+      setDiscount(subtotal * 0.1); // 10% discount
+    } else if (discountCode === 'SAVE50') {
+      setDiscount(50); // Fixed $50 discount
+    } else {
+      setDiscount(null); // Invalid code, no discount
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-8">Your Shopping Cart</h1>
+      {cart.length === 0 ? (
+        <p>Your cart is empty. <Link href="/"><a className="text-blue-500 underline">Go back to shopping</a></Link></p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            {cart.map((item, index) => (
+              <CartCard key={index} item={item} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />
+            ))}
+          </div>
+          <CartSummary subtotal={subtotal} discount={discount} total={total} discountCode={discountCode} setDiscountCode={setDiscountCode} handleDiscountApply={handleDiscountApply} />
         </div>
-      );
-    };
-    
-    export default Cart;
+      )}
+    </div>
+  );
+};
+
+export default Cart;
