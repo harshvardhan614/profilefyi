@@ -12,7 +12,7 @@ const Cart: NextPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8">Your Shopping Cart</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold p-3 mb-8">Your Shopping Cart</h1>
       {cart.length === 0 ? (
         <p>Your cart is empty. <Link href="/"><a className="text-blue-500 underline">Go back to shopping</a></Link></p>
       ) : (

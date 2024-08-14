@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
+import CartNavLink from "./CartNavLink";
 
 const TestNav = () => {
     const { userId } = auth();
@@ -16,7 +17,7 @@ const TestNav = () => {
                 </Link>
                 <ul className="flex items-center gap-4">
                     <div>
-                        <Link href="/">
+                        <Link href="/" className="hidden sm:block">
                             <li>Home</li>
                         </Link>
                     </div>
@@ -26,11 +27,9 @@ const TestNav = () => {
                         </Link>
                     </div>
                     <div>
-                        <Link href="/cart">
-                            <li>Cart</li>
-                        </Link>
+                        <CartNavLink/>
                     </div>
-                    <div className="flex gap-6 items-center">
+                    <div className="flex gap-4 sm:gap-6 items-center">
                         {!userId ? (
                             <>
                                 <Link href="/sign-in">

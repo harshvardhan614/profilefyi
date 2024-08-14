@@ -1,6 +1,5 @@
-"use client";
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React from 'react';
 import { useCart } from './CartContext';
 
 interface ProductCardProps {
@@ -14,23 +13,14 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ image, name, description, price, id }) => {
     const { addToCart, removeFromCart, isInCart } = useCart();
-    const [added, setAdded] = useState(false);
 
-    const handleAddToCart = async () => {
-        try {
-            const alreadyInCart = await isInCart(id);
-            if (alreadyInCart) {
-                await removeFromCart(id);
-                setAdded(false);
-            } else {
-                await addToCart({ id, title: name, price, image, description, quantity: 1 });
-                setAdded(true);
-            }
-        } catch (error) {
-            console.error("An error occurred while updating the cart:", error);
+    const handleAddToCart = () => {
+        if (isInCart(id)) {
+            removeFromCart(id);
+        } else {
+            addToCart({ id, title: name, price, image, description, quantity: 1 });
         }
     };
-
     return (
         <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden" key={id}>
             <Image src={image} alt={name} width={300} height={300} className="w-full h-60 object-cover" />
@@ -40,20 +30,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, name, description, pri
                 <p className="text-gray-700 text-sm mb-4">₹{price.toFixed(2)}</p>
                 <button
                     onClick={handleAddToCart}
-                    className={`w-full py-2 px-4 rounded-md border-2 transition-all duration-300 ${isInCart(id).then(result => {
-                        
-                        if (result) {
-                            return 'bg-gray-500 text-white border-gray-500 hover:bg-white hover:text-gray-500';
-                        } else {
-                            return 'bg-red-500 text-white border-red-500 hover:bg-white hover:text-red-500';
-                        }
-                    }).catch(error => {
-                        console.error("An error occurred while updating the cart:", error);
-                    })}}`}
+                    className={`w-full py-2 px-4 rounded-md border-2 transition-all duration-300 ${isInCart(id)
+                            ? 'bg-gray-500 text-white border-gray-500 hover:bg-white hover:text-gray-500'
+                            : 'bg-red-500 text-white border-red-500 hover:bg-white hover:text-red-500'
+                        }`}
                 >
-                    {isInCart(id).then(result => {
-                        return result ? 'Remove from Cart' : 'Add to Cart';
-                    })}
+                    {isInCart(id) ? 'Remove from Cart' : 'Add to Cart'}
                 </button>
             </div>
         </div>
