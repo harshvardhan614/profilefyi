@@ -33,7 +33,10 @@ const CartSchema = new Schema({
     required: true,
     unique: true,
   },
-  cart: [CartItemSchema], 
+  cart: {
+    type: [CartItemSchema],
+    default: [],
+  },
 });
 
 const Cart = models.Cart || model('Cart', CartSchema);
