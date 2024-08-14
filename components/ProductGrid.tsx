@@ -36,7 +36,7 @@ const ProductGrid: React.FC = () => {
         <>
             {loading ?
                 <Loader/> :
-                <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6 px-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6 px-2">
                 {products.slice(0, 10).map((product) => (
                     <ProductCard
                         key={product.id}

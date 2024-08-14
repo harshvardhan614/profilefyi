@@ -3,6 +3,14 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
 import Navbar from "@/components/Navbar";
+import {
+  ClerkProvider,
+  ClerkLoaded,
+  ClerkLoading,
+} from '@clerk/nextjs'
+import {neobrutalism } from '@clerk/themes'
+import Loader from "@/components/Loader";
+import TestNav from "@/components/TestNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +25,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <CartProvider>
-        <Navbar />
-        {children}
-        </CartProvider>
+    <ClerkProvider appearance={{
+      baseTheme: [neobrutalism],
+    }}>
+      <html lang="en">
+        <body className={inter.className}>
+          <CartProvider>
+            <ClerkLoading>
+              <Loader />
+            </ClerkLoading>
+            <ClerkLoaded>
+              {/* <Navbar /> */}
+              <TestNav/>
+              {children}
+            </ClerkLoaded>
+          </CartProvider>
         </body>
-    </html>
+      </html>
+    </ClerkProvider>
   );
 }

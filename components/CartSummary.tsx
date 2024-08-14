@@ -53,7 +53,7 @@ const CartSummary: React.FC = () => {
           type="text"
           value={discountCode}
           onChange={(e) => setDiscountCode(e.target.value)}
-          placeholder="Enter discount code"
+          placeholder="Discount code-SAVE10, SAVE50"
           className="w-full mb-2 px-4 py-2 border rounded-lg"
         />
         <button
