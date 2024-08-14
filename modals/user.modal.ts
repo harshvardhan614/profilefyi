@@ -1,6 +1,34 @@
 import { Schema, model, models } from "mongoose";
-import Cart from "./cart.modal";
 
+
+const CartItemSchema = new Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    default: 1,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
+});
+
+// Update UserSchema to embed CartItemSchema
 const UserSchema = new Schema({
   clerkId: {
     type: String,
@@ -25,9 +53,12 @@ const UserSchema = new Schema({
   lastName: {
     type: String,
   },
-  cart: Cart, 
+  cart: {
+    type: [CartItemSchema],
+    default: [],            
+  },
 });
 
-const User = models?.User || model("User", UserSchema);
+const User = models.User || model("User", UserSchema);
 
 export default User;
