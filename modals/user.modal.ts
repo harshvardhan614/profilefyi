@@ -1,4 +1,5 @@
 import { Schema, model, models } from "mongoose";
+import Cart from "./cart.modal";
 
 const UserSchema = new Schema({
   clerkId: {
@@ -24,6 +25,7 @@ const UserSchema = new Schema({
   lastName: {
     type: String,
   },
+  cart: Cart, 
 });
 
 const User = models?.User || model("User", UserSchema);

@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from '@clerk/nextjs';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface CartItem {
@@ -23,17 +24,30 @@ interface CartContextProps {
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [cart, setCart] = useState<CartItem[]>(() => {
-        if (typeof window !== 'undefined') {
-            const savedCart = localStorage.getItem('cart');
-            return savedCart ? JSON.parse(savedCart) : [];
-        }
-        return [];
-    });
+  const { isLoaded, userId } = useAuth();
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
+
+  useEffect(() => {
+      if (isLoaded && userId) {
+          // Load cart from database when user is authenticated
+          fetch('/api/cart/load')
+              .then(res => res.json())
+              .then(data => setCart(data.cart));
+      }
+  }, [isLoaded, userId]);
+
+  useEffect(() => {
+      if (isLoaded && userId) {
+          // Save cart to localStorage and database whenever it changes
+          localStorage.setItem('cart', JSON.stringify(cart));
+          fetch('/api/cart/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cart }),
+          });
+      }
+  }, [cart, isLoaded, userId]);
 
     const addToCart = (product: CartItem) => {
         const existingProduct = cart.find(item => item.id === product.id);
