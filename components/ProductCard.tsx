@@ -1,3 +1,4 @@
+"use client";
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useCart } from './CartContext';
@@ -29,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, name, description, pri
             console.error("An error occurred while updating the cart:", error);
         }
     };
-    
+
     return (
         <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden" key={id}>
             <Image src={image} alt={name} width={300} height={300} className="w-full h-60 object-cover" />
