@@ -1,4 +1,5 @@
 "use client";
+import User from '@/modals/user.modal';
 import { useAuth } from '@clerk/nextjs';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
@@ -16,75 +17,87 @@ interface CartContextProps {
     addToCart: (product: CartItem) => void;
     removeFromCart: (id: number) => void;
     updateQuantity: (id: number, quantity: number) => void;
-    isInCart: (id: number) => boolean;
+    isInCart: (id: number) => Promise<boolean>;
     cartCount: number;
-  calculateSubtotal: () => number;
+    calculateSubtotal: () => number;
 }
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { isLoaded, userId } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>([]);
+    const { isLoaded, userId } = useAuth();
+    const [cart, setCart] = useState<CartItem[]>([]);
 
-
-  useEffect(() => {
-      if (isLoaded && userId) {
-          // Load cart from database when user is authenticated
-          fetch('/api/cart/load')
-              .then(res => res.json())
-              .then(data => setCart(data.cart));
-      }
-  }, [isLoaded, userId]);
-
-  useEffect(() => {
-      if (isLoaded && userId) {
-          // Save cart to localStorage and database whenever it changes
-          localStorage.setItem('cart', JSON.stringify(cart));
-          fetch('/api/cart/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ cart }),
-          });
-      }
-  }, [cart, isLoaded, userId]);
-
-    const addToCart = (product: CartItem) => {
-        const existingProduct = cart.find(item => item.id === product.id);
-        if (existingProduct) {
-          updateQuantity(product.id, existingProduct.quantity + 1);
-        } else {
-          setCart((prevCart) => [...prevCart, product]);
+    useEffect(() => {
+        if (isLoaded && userId) {
+            fetch('/api/cart/load')
+                .then(res => res.json())
+                .then(data => setCart(data.cart));
         }
-      };
+    }, [isLoaded, userId]);
 
-    const removeFromCart = (id: number) => {
-        setCart((prevCart) => prevCart.filter(item => item.id !== id));
+    useEffect(() => {
+        if (isLoaded && userId) {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            fetch('/api/cart/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cart }),
+            });
+        }
+    }, [cart, isLoaded, userId]);
+
+    const addToCart = async (item: CartItem) => {
+        if (!userId) return;
+        const user = await User.findOneAndUpdate(
+            { clerkId: userId },
+            { $push: { cart: item } },
+            { new: true, upsert: true }
+        );
+        setCart(user.cart);
     };
 
-    const updateQuantity = (id: number, quantity: number) => {
-        setCart((prevCart) =>
-          prevCart.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
-          )
+    const removeFromCart = async (itemId: number) => {
+        if (!userId) return;
+        const user = await User.findOneAndUpdate(
+            { clerkId: userId },
+            { $pull: { cart: { id: itemId } } },
+            { new: true }
         );
-        if(quantity ==0){
-            removeFromCart(id);
-        }
-      };
+        setCart(user.cart);
+    };
 
-    const isInCart = (id: number) => {
-        return cart.some(item => item.id === id);
+    const updateQuantity = async (itemId: number, quantity: number) => {
+        if (!userId) return;
+        const updatedCart = cart.map(item =>
+            item.id === itemId ? { ...item, quantity: Math.max(0, quantity) } : item
+        );
+        setCart(updatedCart);
+
+        if (quantity === 0) {
+            await removeFromCart(itemId);
+        } else {
+            const item = updatedCart.find(item => item.id === itemId);
+            if (item) {
+                await addToCart(item);
+            }
+        }
+    };
+
+    const isInCart = async (itemId: number): Promise<boolean> => {
+        if (!userId) return false;
+        const user = await User.findOne({ clerkId: userId });
+        return user ? user.cart.some((item: CartItem) => item.id === itemId) : false;
     };
 
     const cartCount = cart.length;
 
     const calculateSubtotal = () => {
         return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      };
+    };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart,updateQuantity, removeFromCart, isInCart, cartCount, calculateSubtotal }}>
+        <CartContext.Provider value={{ cart, addToCart, updateQuantity, removeFromCart, isInCart, cartCount, calculateSubtotal }}>
             {children}
         </CartContext.Provider>
     );
