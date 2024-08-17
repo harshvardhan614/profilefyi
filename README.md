@@ -1,6 +1,6 @@
 # E-Commerce Cart Application
 
-This project is an E-Commerce Cart Application built using Next.js with TypeScript, Clerk for authentication, and MongoDB for database storage. The application allows users to manage their shopping cart, and stores cart data persistently across sessions for authenticated users.
+I added the backend code to store cart user data but Facing some issues in storing cart data with the clerk user data model. This project is an E-Commerce Cart Application built using Next.js with TypeScript, Clerk for authentication, and MongoDB for database storage. The application allows users to manage their shopping cart, and stores cart data persistently across sessions for authenticated users.
 
 ## Table of Contents
 
